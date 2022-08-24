@@ -1,4 +1,4 @@
-from clickup.abstractobject import AbstractObject
+from clickupobjects.abstractobject import AbstractObject
 
 
 class List(AbstractObject):
@@ -6,10 +6,10 @@ class List(AbstractObject):
         super().__init__()
 
     def get_tasks(self):
-        from clickup.task import Task
+        from clickupobjects.task import Task
 
         # this will work for now but I need to eventually include paging
-        route = "list/" + self["id"] + "/task?subtask=true&page=1"
+        route = "list/" + self["id"] + "/task?subtask=true&page=0"
         query = self.api.get(route=route)
         result = []
         for space in query["tasks"]:

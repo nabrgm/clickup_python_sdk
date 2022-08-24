@@ -1,6 +1,7 @@
 import json
 import collections.abc as collections_abc
-from clickup.api import PyClickClient
+
+from api import ClickupClient
 
 
 class AbstractObject(collections_abc.MutableMapping):
@@ -9,9 +10,9 @@ class AbstractObject(collections_abc.MutableMapping):
     Represents an abstract object
     """
 
-    def __init__(self):
+    def __init__(self, api=None):
         self._data = {}
-        self.api = PyClickClient()
+        self.api = api or ClickupClient.get_default_api()
 
     def __getitem__(self, key):
         return self._data[str(key)]

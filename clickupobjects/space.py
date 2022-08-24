@@ -1,4 +1,4 @@
-from clickup.abstractobject import AbstractObject
+from clickupobjects.abstractobject import AbstractObject
 
 
 class Space(AbstractObject):
@@ -6,7 +6,7 @@ class Space(AbstractObject):
         super().__init__()
 
     def get_lists(self, fields=None):
-        from clickup.list import List
+        from clickupobjects.list import List
 
         route = "space/" + self["id"] + "/list?"
         query = self.api.get(route=route)

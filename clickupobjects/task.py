@@ -1,4 +1,4 @@
-from clickup.abstractobject import AbstractObject
+from clickupobjects.abstractobject import AbstractObject
 
 
 class Task(AbstractObject):
