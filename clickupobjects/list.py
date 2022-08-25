@@ -1,4 +1,4 @@
-from clickupobjects.abstractobject import AbstractObject
+from clickup_python_sdk.clickupobjects.abstractobject import AbstractObject
 
 
 class List(AbstractObject):
@@ -6,7 +6,7 @@ class List(AbstractObject):
         super().__init__()
 
     def get_tasks(self):
-        from clickupobjects.task import Task
+        from clickup_python_sdk.clickupobjects.task import Task
 
         # this will work for now but I need to eventually include paging
         route = "list/" + self["id"] + "/task?subtask=true&page=0"

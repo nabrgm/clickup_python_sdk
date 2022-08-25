@@ -1,7 +1,7 @@
 import json
 import collections.abc as collections_abc
 
-from api import ClickupClient
+from clickup_python_sdk.api import ClickupClient
 
 
 class AbstractObject(collections_abc.MutableMapping):

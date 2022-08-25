@@ -1,5 +1,5 @@
 import requests, time, sys, json
-from config import API, VERSION
+from clickup_python_sdk.config import API, VERSION
 
 
 class ClickupClient(object):
@@ -87,7 +87,7 @@ class ClickupClient(object):
         return
 
     def get_teams(self, fields=None):
-        from clickupobjects.team import Team
+        from clickup_python_sdk.clickupobjects.team import Team
 
         target_class = Team
         route = "team"
