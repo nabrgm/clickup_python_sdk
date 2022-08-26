@@ -12,3 +12,20 @@ class Task(AbstractObject):
         route = "task/" + self["id"] + "/tag/" + tag["name"] + "/?"
         query = self.api.post(route=route)
         return query
+
+    def update(self, values=None):
+        """
+        Args: dictionary of key pair values as described by clickups documentation
+        """
+        route = "task/" + self["id"] + "/"
+        query = self.api.put(route=route, values=values)
+        return query
+
+    def update_custom_field(self, custom_field_id=None, values=None):
+        """
+        Args: custom field id is the field id to update (str)
+                values is a dictionary of key pair values as described by clickups documentation
+        """
+        route = "task/" + self["id"] + "/field/" + custom_field_id
+        query = self.api.post(route=route, values=values)
+        return query
