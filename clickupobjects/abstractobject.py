@@ -10,6 +10,9 @@ class AbstractObject(collections_abc.MutableMapping):
     Represents an abstract object
     """
 
+    class Fields:
+        pass
+
     def __init__(self, api=None):
         self._data = {}
         self.api = api or ClickupClient.get_default_api()
