@@ -1,5 +1,5 @@
 import requests, time, sys, json
-from config import API, VERSION
+from clickup_python_sdk.config import API, VERSION
 
 
 class ClickupClient(object):
@@ -35,17 +35,20 @@ class ClickupClient(object):
             params = {}
         url = self.API + route
         response = requests.get(url, headers=self.DEFAULT_HEADERS)
-        body = json.loads(response.text)
+        body = response.json()
         if self.rate_limited(body):
             self.beauty_sleep(60)
             return requests.get(url, headers=self.DEFAULT_HEADERS)
         self.verify_response(body)
         return body
 
-    def post(self, route, values):
+    def post(self, route, values=None):
         url = self.API + route
-        response = requests.post(url, data=json.dumps(values), headers=self.DEFAULT_HEADERS)
-        body = json.loads(response.text)
+        if values is None:
+            response = requests.post(url, headers=self.DEFAULT_HEADERS)
+        else:
+            response = requests.post(url, data=json.dumps(values), headers=self.DEFAULT_HEADERS)
+        body = response.json()
         if self.rate_limited(body):
             self.beauty_sleep(60)
             return requests.post(url, data=json.dumps(values), headers=self.DEFAULT_HEADERS)
@@ -55,7 +58,7 @@ class ClickupClient(object):
     def put(self, route, values):
         url = self.API + route
         response = requests.put(url, data=json.dumps(values), headers=self.DEFAULT_HEADERS)
-        body = response.text
+        body = response.json()
         if self.rate_limited(body):
             self.beauty_sleep(60)
             return requests.put(url, data=json.dumps(values), headers=self.DEFAULT_HEADERS)
@@ -87,7 +90,7 @@ class ClickupClient(object):
         return
 
     def get_teams(self, fields=None):
-        from clickupobjects.team import Team
+        from clickup_python_sdk.clickupobjects.team import Team
 
         target_class = Team
         route = "team"
