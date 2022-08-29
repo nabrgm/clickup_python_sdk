@@ -10,7 +10,7 @@ class List(AbstractObject):
 
         # this will work for now but I need to eventually include paging
         # will need to check task count
-        route = "list/" + self["id"] + "/task?subtasks=True&page=0"
+        route = "list/" + self["id"] + "/task?subtasks=true&page=0"
         query = self.api.get(route=route)
         result = []
         for space in query["tasks"]:

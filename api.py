@@ -100,3 +100,13 @@ class ClickupClient(object):
         for teams in query["teams"]:
             result.append(Team.create_object(data=teams, target_class=target_class))
         return result
+
+    def get_task(self, task_id=None, fields=None):
+        if task_id is None:
+            raise Exception("Must provide task id.")
+        from clickup_python_sdk.clickupobjects.task import Task
+
+        target_class = Task
+        route = "task/" + task_id + "/?custom_task_ids=&team_id=&include_subtasks=true"
+        query = self.get(route=route)
+        return Task.create_object(data=query, target_class=target_class)
