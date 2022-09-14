@@ -8,13 +8,19 @@ class List(AbstractObject):
     def get_tasks(self):
         from clickup_python_sdk.clickupobjects.task import Task
 
-        # this will work for now but I need to eventually include paging
-        # will need to check task count
-        route = "list/" + self["id"] + "/task?subtasks=true&page=0"
-        query = self.api.get(route=route)
+        # this will work for now but I need to eventually include paging at the api instead
+        finished_iteration = False
         result = []
-        for space in query["tasks"]:
-            result.append(Task.create_object(data=space, target_class=Task))
+        page = 0
+        while not finished_iteration:
+            route = "list/" + self["id"] + "/task?subtasks=true&page=" + str(page)
+            query = self.api.get(route=route)
+            if len(query["tasks"]) == 0:
+                finished_iteration = True
+                break
+            for space in query["tasks"]:
+                result.append(Task.create_object(data=space, target_class=Task))
+            page += 1
         return result
 
     def create_task(self, values=None):
