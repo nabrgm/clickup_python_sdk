@@ -77,7 +77,7 @@ class ClickupClient(object):
             raise ValueError(response["err"])
         return True
 
-    def beauty_sleep(t):
+    def beauty_sleep(self, t):
         """
         Just a pretty way to countdown in the terminal
         t is an interger
