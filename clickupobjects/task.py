@@ -29,3 +29,8 @@ class Task(AbstractObject):
         route = "task/" + self["id"] + "/field/" + custom_field_id
         query = self.api.post(route=route, values=values)
         return query
+
+    def delete(self):
+        route = "task/" + self["id"] + "/"
+        query = self.api.delete(route=route)
+        return query
