@@ -65,6 +65,19 @@ class ClickupClient(object):
         self.verify_response(body)
         return body
 
+    def delete(self, route):
+        url = self.API + route
+        response = requests.delete(url, headers=self.DEFAULT_HEADERS)
+        try:
+            body = response.json()
+        except:
+            return response
+        if self.rate_limited(body):
+            self.beauty_sleep(60)
+            return requests.delete(url, headers=self.DEFAULT_HEADERS)
+        self.verify_response(body)
+        return body
+
     def rate_limited(self, response):
         if "err" in response.keys() and response["err"] == "Rate limit reached":
             print("Rate limit reached. Pausing for a minute.")
