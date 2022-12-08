@@ -5,16 +5,23 @@ class List(AbstractObject):
     def __init__(self) -> None:
         super().__init__()
 
-    def get_tasks(self):
+    def get_tasks(self, params=None):
         from clickup_python_sdk.clickupobjects.task import Task
 
         # this will work for now but I need to eventually include paging at the api instead
         finished_iteration = False
         result = []
         page = 0
+        # TODO: run through key value pairs in params and add them to the route
+
+        route = "/task?subtasks=true"
+        params = {"include_closed": "true"}
+        if params is not None:
+            for key, value in params.items():
+                route += "&" + key + "=" + value
+
         while not finished_iteration:
-            route = "list/" + self["id"] + "/task?subtasks=true&page=" + str(page)
-            query = self.api.get(route=route)
+            query = self.api.get(route=route + f"$page={page}")
             if len(query["tasks"]) == 0:
                 finished_iteration = True
                 break
