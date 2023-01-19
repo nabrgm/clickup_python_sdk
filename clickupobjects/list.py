@@ -6,7 +6,7 @@ class List(AbstractObject):
         super().__init__()
 
     def get_tasks(self, params=None):
-        from clickup_python_sdk.clickup_python_sdk.clickupobjects.task import Task
+        from clickup_python_sdk.clickupobjects.task import Task
 
         # this will work for now but I need to eventually include paging at the api instead
         finished_iteration = False
