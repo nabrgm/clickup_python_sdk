@@ -14,14 +14,13 @@ class List(AbstractObject):
         page = 0
         # TODO: run through key value pairs in params and add them to the route
 
-        route = "/task?subtasks=true"
-        params = {"include_closed": "true"}
-        if params is not None:
+        route = "list/" + self["id"] + "/task?subtasks=true"
+        if params:
             for key, value in params.items():
                 route += "&" + key + "=" + value
 
         while not finished_iteration:
-            query = self.api.get(route=route + f"$page={page}")
+            query = self.api.get(route=route + f"&page={page}")
             if len(query["tasks"]) == 0:
                 finished_iteration = True
                 break
