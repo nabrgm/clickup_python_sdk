@@ -45,9 +45,6 @@ class List(AbstractObject):
         from clickup_python_sdk.clickupobjects.customfield import CustomField
 
         route = "list/" + self["id"] + "/field"
-        # this will work for now but I need to eventually include paging
-        # will need to check task count
-        route = "list/" + self["id"] + "/task?subtasks=True&page=0"
         query = self.api.get(route=route)
         result = []
         for space in query["fields"]:
