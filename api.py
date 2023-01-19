@@ -65,6 +65,19 @@ class ClickupClient(object):
         self.verify_response(body)
         return body
 
+    def delete(self, route):
+        url = self.API + route
+        response = requests.delete(url, headers=self.DEFAULT_HEADERS)
+        try:
+            body = response.json()
+        except:
+            return response
+        if self.rate_limited(body):
+            self.beauty_sleep(60)
+            return requests.delete(url, headers=self.DEFAULT_HEADERS)
+        self.verify_response(body)
+        return body
+
     def rate_limited(self, response):
         if "err" in response.keys() and response["err"] == "Rate limit reached":
             print("Rate limit reached. Pausing for a minute.")
@@ -77,7 +90,7 @@ class ClickupClient(object):
             raise ValueError(response["err"])
         return True
 
-    def beauty_sleep(t):
+    def beauty_sleep(self, t):
         """
         Just a pretty way to countdown in the terminal
         t is an interger
@@ -100,3 +113,13 @@ class ClickupClient(object):
         for teams in query["teams"]:
             result.append(Team.create_object(data=teams, target_class=target_class))
         return result
+
+    def get_task(self, task_id=None, fields=None):
+        if task_id is None:
+            raise Exception("Must provide task id.")
+        from clickup_python_sdk.clickupobjects.task import Task
+
+        target_class = Task
+        route = "task/" + task_id + "/?custom_task_ids=&team_id=&include_subtasks=true"
+        query = self.get(route=route)
+        return Task.create_object(data=query, target_class=target_class)
