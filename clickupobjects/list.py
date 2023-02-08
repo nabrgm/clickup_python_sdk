@@ -5,6 +5,12 @@ class List(AbstractObject):
     def __init__(self) -> None:
         super().__init__()
 
+    def update(self, values=None):
+        route = "list/" + self["id"]
+        query = self.api.put(route=route, values=values)
+
+        return query
+
     def get_tasks(self, params=None):
         from clickup_python_sdk.clickupobjects.task import Task
 
@@ -33,7 +39,7 @@ class List(AbstractObject):
         # I will need to refine my documentation later on god
         """
         Args: values is a dictionary with key values defining the task.
-                information can be found here "https://clickup.com/api" under task creation
+            information can be found here "https://clickup.com/api" under task creation
         """
         route = "list/" + self["id"] + "/task"
         from clickup_python_sdk.clickupobjects.task import Task
@@ -50,38 +56,3 @@ class List(AbstractObject):
         for space in query["fields"]:
             result.append(CustomField.create_object(data=space, target_class=CustomField))
         return result
-
-
-"""
-  {
-    "name": "New Task Name",
-    "description": "New Task Description",
-    "assignees": [
-      183
-    ],
-    "tags": [
-      "tag name 1"
-    ],
-    "status": "Open",
-    "priority": 3,
-    "due_date": 1508369194377,
-    "due_date_time": false,
-    "time_estimate": 8640000,
-    "start_date": 1567780450202,
-    "start_date_time": false,
-    "notify_all": true,
-    "parent": null,
-    "links_to": null,
-    "check_required_custom_fields": true,
-    "custom_fields": [
-      {
-        "id": "0a52c486-5f05-403b-b4fd-c512ff05131c",
-        "value": 23
-      },
-      {
-        "id": "03efda77-c7a0-42d3-8afd-fd546353c2f5",
-        "value": "Text field input"
-      }
-    ]
-  }
-"""
