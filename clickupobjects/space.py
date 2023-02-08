@@ -31,6 +31,13 @@ class Space(AbstractObject):
         query = self.api.post(route=route, values=values)
         return query
 
+    def get_folders(self, params=None):
+        from clickup_python_sdk.clickupobjects.folder import Folder
+
+        route = "space/" + self["id"] + "/folder"
+        query = self.api.get(route=route)
+        return [AbstractObject.create_object(data=folder, target_class=Folder) for folder in query["folders"]]
+
 
 # this is the desired input for requests
 """
