@@ -7,7 +7,7 @@ class List(AbstractObject):
 
     def update(self, values=None):
         route = "list/" + self["id"]
-        query = self.api.put(route=route, values=values)
+        query = self.api._put(route=route, values=values)
 
         return query
 
@@ -26,12 +26,12 @@ class List(AbstractObject):
                 route += "&" + key + "=" + value
 
         while not finished_iteration:
-            query = self.api.get(route=route + f"&page={page}")
+            query, headers = self.api._get(route=route + f"&page={page}")
             if len(query["tasks"]) == 0:
                 finished_iteration = True
                 break
             for space in query["tasks"]:
-                result.append(Task.create_object(data=space, target_class=Task))
+                result.append(Task.create_object(data=space, target_class=Task, response_headers=headers))
             page += 1
         return result
 
@@ -44,15 +44,15 @@ class List(AbstractObject):
         route = "list/" + self["id"] + "/task"
         from clickup_python_sdk.clickupobjects.task import Task
 
-        query = self.api.post(route=route, values=values)
-        return Task.create_object(data=query, target_class=Task)
+        query, headers = self.api._post(route=route, values=values)
+        return Task.create_object(data=query, target_class=Task, response_headers=headers)
 
     def get_custom_fields(self):
         from clickup_python_sdk.clickupobjects.customfield import CustomField
 
         route = "list/" + self["id"] + "/field"
-        query = self.api.get(route=route)
+        query, headers = self.api._get(route=route)
         result = []
         for space in query["fields"]:
-            result.append(CustomField.create_object(data=space, target_class=CustomField))
+            result.append(CustomField.create_object(data=space, target_class=CustomField, response_headers=headers))
         return result

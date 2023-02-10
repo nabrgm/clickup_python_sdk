@@ -69,7 +69,7 @@ class AbstractObject(collections_abc.MutableMapping):
         raise NotImplementedError(f"{cls.__name__} must implement get_endpoint")
 
     # reads in data from json object
-    def _set_data(self, data):
+    def _set_data(self, data, headers):
         if hasattr(data, "items"):
             for key, value in data.items():
                 self[key] = value
@@ -77,6 +77,7 @@ class AbstractObject(collections_abc.MutableMapping):
             # raise error
             raise ValueError("Bad data to set object data")
         self._json = data
+        self.headers = headers
 
     def export_value(self, data):
         if isinstance(data, AbstractObject):
@@ -90,7 +91,7 @@ class AbstractObject(collections_abc.MutableMapping):
     def export_all_data(self):
         return self.export_value(self._data)
 
-    def create_object(data, target_class):
+    def create_object(data, target_class, response_headers):
         new_object = target_class()
-        new_object._set_data(data)
+        new_object._set_data(data, response_headers)
         return new_object

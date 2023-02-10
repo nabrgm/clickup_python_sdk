@@ -10,7 +10,7 @@ class Task(AbstractObject):
         Args: Tag object
         """
         route = "task/" + self["id"] + "/tag/" + tag["name"] + "/?"
-        query = self.api.post(route=route)
+        query = self.api._post(route=route)
         return query
 
     def update(self, values=None):
@@ -18,7 +18,7 @@ class Task(AbstractObject):
         Args: dictionary of key pair values as described by clickups documentation
         """
         route = "task/" + self["id"] + "/"
-        query = self.api.put(route=route, values=values)
+        query = self.api._put(route=route, values=values)
         return query
 
     def update_custom_field(self, custom_field_id=None, values=None):
@@ -27,10 +27,10 @@ class Task(AbstractObject):
                 values is a dictionary of key pair values as described by clickups documentation
         """
         route = "task/" + self["id"] + "/field/" + custom_field_id
-        query = self.api.post(route=route, values=values)
+        query = self.api._post(route=route, values=values)
         return query
 
     def delete(self):
         route = "task/" + self["id"] + "/"
-        query = self.api.delete(route=route)
+        query = self.api._delete(route=route)
         return query
