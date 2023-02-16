@@ -9,8 +9,10 @@ class Team(AbstractObject):
         from clickup_python_sdk.clickupobjects.space import Space
 
         route = "team/" + self["id"] + "/space?"
-        query = self.api._get(route=route)
+        method = "GET"
+        response = self.api.make_request(method=method, route=route)
+
         result = []
-        for space in query["spaces"]:
+        for space in response["spaces"]:
             result.append(Space.create_object(data=space, target_class=Space))
         return result

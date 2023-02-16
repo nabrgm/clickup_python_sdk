@@ -91,7 +91,6 @@ class ClickupClient(object):
         method = "GET"
         response = self.make_request(method=method, route=route)
         result = []
-        print(response)
         for teams in response["teams"]:
             result.append(Team.create_object(data=teams, target_class=target_class))
         return result
@@ -103,5 +102,6 @@ class ClickupClient(object):
 
         target_class = Task
         route = "task/" + task_id + "/?custom_task_ids=&team_id=&include_subtasks=true"
-        response = self.get(route=route)
+        method = "GET"
+        response = self.make_request(method=method, route=route)
         return Task.create_object(data=response, target_class=target_class)

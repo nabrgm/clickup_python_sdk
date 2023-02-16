@@ -7,9 +7,10 @@ class List(AbstractObject):
 
     def update(self, values=None):
         route = "list/" + self["id"]
-        query = self.api._put(route=route, values=values)
+        method = "PUT"
+        response = self.api.make_request(method=method, route=route, values=values)
 
-        return query
+        return response
 
     def get_tasks(self, params=None):
         from clickup_python_sdk.clickupobjects.task import Task
@@ -21,16 +22,17 @@ class List(AbstractObject):
         # TODO: run through key value pairs in params and add them to the route
 
         route = "list/" + self["id"] + "/task?subtasks=true"
+        method = "GET"
         if params:
             for key, value in params.items():
                 route += "&" + key + "=" + value
 
         while not finished_iteration:
-            query = self.api._get(route=route + f"&page={page}")
-            if len(query["tasks"]) == 0:
+            response = self.api.make_request(method=method, route=route + f"&page={page}")
+            if len(response["tasks"]) == 0:
                 finished_iteration = True
                 break
-            for space in query["tasks"]:
+            for space in response["tasks"]:
                 result.append(Task.create_object(data=space, target_class=Task))
             page += 1
         return result
@@ -41,18 +43,21 @@ class List(AbstractObject):
         Args: values is a dictionary with key values defining the task.
             information can be found here "https://clickup.com/api" under task creation
         """
-        route = "list/" + self["id"] + "/task"
         from clickup_python_sdk.clickupobjects.task import Task
 
-        query = self.api._post(route=route, values=values)
-        return Task.create_object(data=query, target_class=Task)
+        route = "list/" + self["id"] + "/task"
+        method = "POST"
+
+        response = self.api.make_request(method=method, route=route, values=values)
+        return Task.create_object(data=response, target_class=Task)
 
     def get_custom_fields(self):
         from clickup_python_sdk.clickupobjects.customfield import CustomField
 
         route = "list/" + self["id"] + "/field"
-        query = self.api._get(route=route)
+        method = "GET"
+        response = self.api.make_request(method=method, route=route)
         result = []
-        for space in query["fields"]:
+        for space in response["fields"]:
             result.append(CustomField.create_object(data=space, target_class=CustomField))
         return result
