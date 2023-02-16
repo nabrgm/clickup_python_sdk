@@ -91,7 +91,7 @@ class AbstractObject(collections_abc.MutableMapping):
     def export_all_data(self):
         return self.export_value(self._data)
 
-    def create_object(data, target_class, response_headers):
+    def create_object(data, target_class, headers):
         new_object = target_class()
-        new_object._set_data(data, response_headers)
+        new_object._set_data(data, headers)
         return new_object

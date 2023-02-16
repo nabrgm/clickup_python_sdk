@@ -30,12 +30,13 @@ class ClickupClient(object):
         return cls.DEFAULT_API
 
     def make_request(self, method, route, params=None, values=None):
+        # handle rate limit
         if not params:
             params = {}
         url = self.API + route
         if method in ["GET", "DELETE"]:
-            response = requests.get(url, headers=self.DEFAULT_HEADERS)
             response = requests.request(
+                url=url,
                 method=method,
                 headers=self.DEFAULT_HEADERS,
             )
@@ -52,72 +53,23 @@ class ClickupClient(object):
             body = response.json()
         except:
             return response
-        if self._rate_limited(body):
-            self._beauty_sleep(60)
-            return self.make_request(method, route, params, values)
-        self._verify_response(body)
-        return body
-
-    # def _get(self, route, params=None):
-    #     # Plan on creating a type checker and params verify
-    #     if not params:
-    #         params = {}
-    #     url = self.API + route
-    #     response = requests.get(url, headers=self.DEFAULT_HEADERS)
-    #     body = response.json()
-    #     if self._rate_limited(body):
-    #         self._beauty_sleep(60)
-    #         return self._get(url, headers=self.DEFAULT_HEADERS)
-    #     self._verify_response(body)
-    #     return body
-
-    # def _post(self, route, values=None):
-    #     url = self.API + route
-    #     if values is None:
-    #         response = requests.post(url, headers=self.DEFAULT_HEADERS)
-    #     else:
-    #         response = requests.post(url, data=json.dumps(values), headers=self.DEFAULT_HEADERS)
-    #     body = response.json()
-    #     if self._rate_limited(body):
-    #         self._beauty_sleep(60)
-    #         return self._post(url, data=json.dumps(values), headers=self.DEFAULT_HEADERS)
-    #     self._verify_response(body)
-    #     return body
-
-    # def _put(self, route, values):
-    #     url = self.API + route
-    #     response = requests.put(url, data=json.dumps(values), headers=self.DEFAULT_HEADERS)
-    #     body = response.json()
-    #     if self._rate_limited(body):
-    #         self._beauty_sleep(60)
-    #         return self._put(url, data=json.dumps(values), headers=self.DEFAULT_HEADERS)
-    #     self._verify_response(body)
-    #     return body
-
-    # def _delete(self, route):
-    #     url = self.API + route
-    #     response = requests.delete(url, headers=self.DEFAULT_HEADERS)
-    #     try:
-    #         body = response.json()
-    #     except:
-    #         return response
-    #     if self._rate_limited(body):
-    #         self._beauty_sleep(60)
-    #         return self._delete(url, headers=self.DEFAULT_HEADERS)
-    #     self._verify_response(body)
-    #     return body
-
-    def _rate_limited(self, response):
-        if "err" in response.keys() and response["err"] == "Rate limit reached":
-            print("Rate limit reached. Pausing for a minute.")
-            return True
-        else:
-            return False
+        self._update_rate_limits(response.headers)
+        self._verify_response(response)
+        return body, response.headers
 
     def _verify_response(self, response):
-        if "err" in response.keys() and response["err"] != "Rate limit reached":
-            raise ValueError(response["err"])
+        status_code = response.status_code
+        if not 200 <= status_code < 300:
+            message = response.json().get("err")
+            raise requests.exceptions.RequestException(
+                f"Request failed with status code {status_code}. Message: {message}"
+            )
         return True
+
+    def _update_rate_limits(self, headers):
+        self.RATE_LIMIT_REMAINING = headers.get("X-RateLimit-Remaining")
+        self.RATE_RESET = headers.get("X-RateLimit-Reset")
+        return
 
     def _beauty_sleep(self, t):
         """
@@ -136,11 +88,11 @@ class ClickupClient(object):
 
         target_class = Team
         route = "team"
-        data = self._get(route=route)
-
+        method = "GET"
+        response, headers = self.make_request(method=method, route=route)
         result = []
-        for teams in data["teams"]:
-            result.append(Team.create_object(data=teams, target_class=target_class))
+        for teams in response["teams"]:
+            result.append(Team.create_object(data=teams, target_class=target_class, headers=headers))
         return result
 
     def get_task(self, task_id=None, fields=None):
@@ -150,5 +102,5 @@ class ClickupClient(object):
 
         target_class = Task
         route = "task/" + task_id + "/?custom_task_ids=&team_id=&include_subtasks=true"
-        data = self.get(route=route)
-        return Task.create_object(data=data, target_class=target_class)
+        response, headers = self.get(route=route)
+        return Task.create_object(data=response, target_class=target_class, headers=headers)
