@@ -55,7 +55,7 @@ class ClickupClient(object):
             return response
         self._update_rate_limits(response.headers)
         self._verify_response(response)
-        return body, response.headers
+        return body
 
     def _verify_response(self, response):
         status_code = response.status_code
@@ -89,10 +89,11 @@ class ClickupClient(object):
         target_class = Team
         route = "team"
         method = "GET"
-        response, headers = self.make_request(method=method, route=route)
+        response = self.make_request(method=method, route=route)
         result = []
+        print(response)
         for teams in response["teams"]:
-            result.append(Team.create_object(data=teams, target_class=target_class, headers=headers))
+            result.append(Team.create_object(data=teams, target_class=target_class))
         return result
 
     def get_task(self, task_id=None, fields=None):
@@ -102,5 +103,5 @@ class ClickupClient(object):
 
         target_class = Task
         route = "task/" + task_id + "/?custom_task_ids=&team_id=&include_subtasks=true"
-        response, headers = self.get(route=route)
-        return Task.create_object(data=response, target_class=target_class, headers=headers)
+        response = self.get(route=route)
+        return Task.create_object(data=response, target_class=target_class)

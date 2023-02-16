@@ -9,20 +9,20 @@ class Space(AbstractObject):
         from clickup_python_sdk.clickupobjects.list import List
 
         route = "space/" + self["id"] + "/list?"
-        data, headers = self.api._get(route=route)
+        data = self.api._get(route=route)
         result = []
         for space in data["lists"]:
-            result.append(List.create_object(data=space, target_class=List, response_headers=headers))
+            result.append(List.create_object(data=space, target_class=List))
         return result
 
     def get_tags(self):
         from clickup_python_sdk.clickupobjects.tags import Tag
 
         route = "space/" + self["id"] + "/tag"
-        query, headers = self.api._get(route=route)
+        query = self.api._get(route=route)
         result = []
         for space in query["tags"]:
-            result.append(Tag.create_object(data=space, target_class=Tag, response_headers=headers))
+            result.append(Tag.create_object(data=space, target_class=Tag))
         return result
 
     def create_tag(self, name):
@@ -35,11 +35,8 @@ class Space(AbstractObject):
         from clickup_python_sdk.clickupobjects.folder import Folder
 
         route = "space/" + self["id"] + "/folder"
-        query, headers = self.api._get(route=route)
-        return [
-            AbstractObject.create_object(data=folder, target_class=Folder, response_headers=headers)
-            for folder in query["folders"]
-        ]
+        query = self.api._get(route=route)
+        return [AbstractObject.create_object(data=folder, target_class=Folder) for folder in query["folders"]]
 
 
 # this is the desired input for requests
