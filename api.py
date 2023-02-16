@@ -29,54 +29,83 @@ class ClickupClient(object):
     def get_default_api(cls):
         return cls.DEFAULT_API
 
-    def _get(self, route, params=None):
-        # Plan on creating a type checker and params verify
+    def make_request(self, method, route, params=None, values=None):
         if not params:
             params = {}
         url = self.API + route
-        response = requests.get(url, headers=self.DEFAULT_HEADERS)
-        body = response.json()
-        if self._rate_limited(body):
-            self._beauty_sleep(60)
-            return self._get(url, headers=self.DEFAULT_HEADERS)
-        self._verify_response(body)
-        return body, response.headers
-
-    def _post(self, route, values=None):
-        url = self.API + route
-        if values is None:
-            response = requests.post(url, headers=self.DEFAULT_HEADERS)
+        if method in ["GET", "DELETE"]:
+            response = requests.get(url, headers=self.DEFAULT_HEADERS)
+            response = requests.request(
+                method=method,
+                headers=self.DEFAULT_HEADERS,
+            )
+        elif method == "POST":
+            if values is None:
+                response = requests.post(url, headers=self.DEFAULT_HEADERS)
+            else:
+                response = requests.post(url, data=json.dumps(values), headers=self.DEFAULT_HEADERS)
+        elif method == "PUT":
+            response = requests.put(url, data=json.dumps(values), headers=self.DEFAULT_HEADERS)
         else:
-            response = requests.post(url, data=json.dumps(values), headers=self.DEFAULT_HEADERS)
-        body = response.json()
-        if self._rate_limited(body):
-            self._beauty_sleep(60)
-            return self._post(url, data=json.dumps(values), headers=self.DEFAULT_HEADERS)
-        self._verify_response(body)
-        return body, response.headers
-
-    def _put(self, route, values):
-        url = self.API + route
-        response = requests.put(url, data=json.dumps(values), headers=self.DEFAULT_HEADERS)
-        body = response.json()
-        if self._rate_limited(body):
-            self._beauty_sleep(60)
-            return self._put(url, data=json.dumps(values), headers=self.DEFAULT_HEADERS)
-        self._verify_response(body)
-        return body, response.headers
-
-    def _delete(self, route):
-        url = self.API + route
-        response = requests.delete(url, headers=self.DEFAULT_HEADERS)
+            raise ValueError("Invalid request method")
         try:
             body = response.json()
         except:
             return response
         if self._rate_limited(body):
             self._beauty_sleep(60)
-            return self._delete(url, headers=self.DEFAULT_HEADERS)
+            return self.make_request(method, route, params, values)
         self._verify_response(body)
-        return body, response.headers
+        return body
+
+    # def _get(self, route, params=None):
+    #     # Plan on creating a type checker and params verify
+    #     if not params:
+    #         params = {}
+    #     url = self.API + route
+    #     response = requests.get(url, headers=self.DEFAULT_HEADERS)
+    #     body = response.json()
+    #     if self._rate_limited(body):
+    #         self._beauty_sleep(60)
+    #         return self._get(url, headers=self.DEFAULT_HEADERS)
+    #     self._verify_response(body)
+    #     return body
+
+    # def _post(self, route, values=None):
+    #     url = self.API + route
+    #     if values is None:
+    #         response = requests.post(url, headers=self.DEFAULT_HEADERS)
+    #     else:
+    #         response = requests.post(url, data=json.dumps(values), headers=self.DEFAULT_HEADERS)
+    #     body = response.json()
+    #     if self._rate_limited(body):
+    #         self._beauty_sleep(60)
+    #         return self._post(url, data=json.dumps(values), headers=self.DEFAULT_HEADERS)
+    #     self._verify_response(body)
+    #     return body
+
+    # def _put(self, route, values):
+    #     url = self.API + route
+    #     response = requests.put(url, data=json.dumps(values), headers=self.DEFAULT_HEADERS)
+    #     body = response.json()
+    #     if self._rate_limited(body):
+    #         self._beauty_sleep(60)
+    #         return self._put(url, data=json.dumps(values), headers=self.DEFAULT_HEADERS)
+    #     self._verify_response(body)
+    #     return body
+
+    # def _delete(self, route):
+    #     url = self.API + route
+    #     response = requests.delete(url, headers=self.DEFAULT_HEADERS)
+    #     try:
+    #         body = response.json()
+    #     except:
+    #         return response
+    #     if self._rate_limited(body):
+    #         self._beauty_sleep(60)
+    #         return self._delete(url, headers=self.DEFAULT_HEADERS)
+    #     self._verify_response(body)
+    #     return body
 
     def _rate_limited(self, response):
         if "err" in response.keys() and response["err"] == "Rate limit reached":
@@ -107,11 +136,11 @@ class ClickupClient(object):
 
         target_class = Team
         route = "team"
-        data, headers = self._get(route=route)
+        data = self._get(route=route)
 
         result = []
         for teams in data["teams"]:
-            result.append(Team.create_object(data=teams, target_class=target_class, response_headers=headers))
+            result.append(Team.create_object(data=teams, target_class=target_class))
         return result
 
     def get_task(self, task_id=None, fields=None):
@@ -121,5 +150,5 @@ class ClickupClient(object):
 
         target_class = Task
         route = "task/" + task_id + "/?custom_task_ids=&team_id=&include_subtasks=true"
-        data, headers = self.get(route=route)
-        return Task.create_object(data=data, target_class=target_class, response_headers=headers)
+        data = self.get(route=route)
+        return Task.create_object(data=data, target_class=target_class)
