@@ -15,6 +15,8 @@ class ClickupClient(object):
         cls._set_default_headers(user_token)
         api = cls()
         cls._set_default_api(api)
+        api.set_token_user()
+
         return api
 
     @classmethod
@@ -28,6 +30,23 @@ class ClickupClient(object):
     @classmethod
     def get_default_api(cls):
         return cls.DEFAULT_API
+
+    def set_token_user(self):
+        """
+        Sets the user associated with the authorization token.
+
+        Returns:
+        None
+        """
+        from clickup_python_sdk.clickupobjects.user import User
+
+        route = "user"
+        method = "GET"
+        response = self.make_request(method=method, route=route)
+
+        target_class = User
+        self.TOKEN_USER = User.create_object(data=response["user"], target_class=target_class)
+        return
 
     def make_request(self, method, route, params=None, values=None):
         # handle rate limit
@@ -56,6 +75,15 @@ class ClickupClient(object):
         self._update_rate_limits(response.headers)
         self._verify_response(response)
         return body
+
+    def refresh_rate_limit(self):
+        """
+        makes a get request to the authorized_user endpoint to refresh the rate limit
+        """
+        route = "user"
+        method = "GET"
+        response = self.make_request(method=method, route=route)
+        return None
 
     def _verify_response(self, response):
         status_code = response.status_code
