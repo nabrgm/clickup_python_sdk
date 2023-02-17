@@ -22,13 +22,14 @@ class Task(AbstractObject):
         response = self.api.make_request(method=method, route=route, values=values)
         return response
 
-    def update_custom_field(self, custom_field_id=None, values=None):
+    def update_custom_field(self, custom_field_id=None, value=None):
         """
         Args: custom field id is the field id to update (str)
                 values is a dictionary of key pair values as described by clickups documentation
         """
         route = "task/" + self["id"] + "/field/" + custom_field_id
         method = "POST"
+        values = {"value": value}
         response = self.api.make_request(method=method, route=route, values=values)
         return response
 
