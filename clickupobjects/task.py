@@ -38,3 +38,18 @@ class Task(AbstractObject):
         method = "DELETE"
         response = self.api.make_request(method=method, route=route)
         return response
+
+    # file = {"attachment": ("data.csv", open("logs/data.csv", "rb"))}
+    # headers = {"Authorization": "pk_54006660_THIJHCCF4NS0DLNHCMFF6NMR88VHV8Z7"}
+    # request = requests.post(f"https://api.clickup.com/api/v2/task/8677d5ua1/attachment", files=file, headers=headers)
+    # print(request.json())
+    def upload_file(self, file):
+        import requests
+
+        """
+        Args: file is a dictionary of key pair values as described by clickups documentation
+        """
+        route = "task/" + self["id"] + "/attachment"
+        method = "POST"
+        response = self.api.make_request(method=method, route=route, file=file)
+        return response

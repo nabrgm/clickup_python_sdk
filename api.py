@@ -48,7 +48,7 @@ class ClickupClient(object):
         self.TOKEN_USER = User.create_object(data=response["user"], target_class=target_class)
         return
 
-    def make_request(self, method, route, params=None, values=None):
+    def make_request(self, method, route, params=None, values=None, file=None):
         # handle rate limit
         if not params:
             params = {}
@@ -60,7 +60,11 @@ class ClickupClient(object):
                 headers=self.DEFAULT_HEADERS,
             )
         elif method == "POST":
-            if values is None:
+            if file:
+                headers = {"Authorization": self.DEFAULT_HEADERS["Authorization"]}
+                response = requests.post(url, files=file, headers=headers)
+                return
+            elif values is None:
                 response = requests.post(url, headers=self.DEFAULT_HEADERS)
             else:
                 response = requests.post(url, data=json.dumps(values), headers=self.DEFAULT_HEADERS)
@@ -82,8 +86,8 @@ class ClickupClient(object):
         """
         route = "user"
         method = "GET"
-        response = self.make_request(method=method, route=route)
-        return None
+        _ = self.make_request(method=method, route=route)
+        return self
 
     def _verify_response(self, response):
         status_code = response.status_code
