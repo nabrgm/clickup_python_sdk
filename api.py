@@ -75,7 +75,7 @@ class ClickupClient(object):
         try:
             body = response.json()
         except:
-            return response
+            raise requests.exceptions.RequestException(response.text)
         self._update_rate_limits(response.headers)
         self._verify_response(response)
         return body
