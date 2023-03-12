@@ -2,8 +2,8 @@ from clickup_python_sdk.clickupobjects.abstractobject import AbstractObject
 
 
 class Folder(AbstractObject):
-    def __init__(self) -> None:
-        super().__init__()
+    def __init__(self, id=None) -> None:
+        super().__init__(id=id)
 
     def get_lists(self, params=None):
         from clickup_python_sdk.clickupobjects.list import List

@@ -13,9 +13,11 @@ class AbstractObject(collections_abc.MutableMapping):
     class Fields:
         pass
 
-    def __init__(self, api=None):
+    def __init__(self, api=None, id=None):
         self._data = {}
         self.api = api or ClickupClient.get_default_api()
+        if id:
+            self["id"] = id
 
     def __getitem__(self, key):
         return self._data[str(key)]
@@ -60,13 +62,10 @@ class AbstractObject(collections_abc.MutableMapping):
             ),
         )
 
-    @classmethod
-    def get_endpoint(cls):
-        """
-        Returns the class endpoint
-        Must be implemented on subclasses.
-        """
-        raise NotImplementedError(f"{cls.__name__} must implement get_endpoint")
+    def get_endpoint(self):
+        if "id" not in self:
+            raise ValueError(f"{self.__class__.__name__} is not set.")
+        return f"{self.__class__.__name__.lower()}/" + self["id"]
 
     # reads in data from json object
     def _set_data(self, data):
@@ -94,3 +93,12 @@ class AbstractObject(collections_abc.MutableMapping):
         new_object = target_class()
         new_object._set_data(data)
         return new_object
+
+    def get(self):
+        """
+        Returns the object data
+        """
+        route = self.get_endpoint()
+        data = self.api.make_request("GET", route)
+        self._set_data(data)
+        return self
