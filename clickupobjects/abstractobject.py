@@ -48,9 +48,6 @@ class AbstractObject(collections_abc.MutableMapping):
     def __contains__(self, key):
         return key in self._data
 
-    def __unicode__(self):
-        return unicode(self._data)
-
     def __repr__(self):
         return "<%s> %s" % (
             self.__class__.__name__,

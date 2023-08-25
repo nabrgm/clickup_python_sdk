@@ -61,3 +61,14 @@ class List(AbstractObject):
         for space in response["fields"]:
             result.append(CustomField.create_object(data=space, target_class=CustomField))
         return result
+
+    def get_users(self):
+        from clickup_python_sdk.clickupobjects.user import User
+
+        route = "list/" + self["id"] + "/member"
+        method = "GET"
+        response = self.api.make_request(method=method, route=route)
+        result = []
+        for space in response["members"]:
+            result.append(User.create_object(data=space, target_class=User))
+        return result
