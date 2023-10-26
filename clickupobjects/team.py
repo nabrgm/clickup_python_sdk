@@ -16,3 +16,12 @@ class Team(AbstractObject):
         for space in response["spaces"]:
             result.append(Space.create_object(data=space, target_class=Space))
         return result
+
+    def get_task_templates(self, page=0):
+        from clickup_python_sdk.clickupobjects.tasktemplate import TaskTemplate
+
+        route = "team/" + self["id"] + "/taskTemplate"
+        method = "GET"
+        params = {"page": page}
+        response = self.api.make_request(method=method, route=route, params=params)
+        return response
