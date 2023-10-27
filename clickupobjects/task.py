@@ -2,8 +2,12 @@ from clickup_python_sdk.clickupobjects.abstractobject import AbstractObject
 
 
 class Task(AbstractObject):
-    def __init__(self) -> None:
-        super().__init__()
+    def __init__(self, id=None) -> None:
+        super().__init__(id=id)
+
+    def get_endpoint(self):
+        assert self["id"] != None, "Must provide task id"
+        return "task" + "/" + self["id"]
 
     def add_tag(self, tag=None):
         """
@@ -52,4 +56,10 @@ class Task(AbstractObject):
         route = "task/" + self["id"] + "/attachment"
         method = "POST"
         response = self.api.make_request(method=method, route=route, file=file)
+        return response
+
+    def get_time_in_status(self):
+        route = "task/" + self["id"] + "/time_in_status"
+        method = "GET"
+        response = self.api.make_request(method=method, route=route)
         return response
