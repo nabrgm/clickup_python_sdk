@@ -21,7 +21,7 @@ class List(AbstractObject):
         page = 0
         # TODO: run through key value pairs in params and add them to the route
 
-        route = "list/" + self["id"] + "/task?subtasks=true"
+        route = "list/" + self["id"] + "/task?"
         method = "GET"
         if params:
             for key, value in params.items():
