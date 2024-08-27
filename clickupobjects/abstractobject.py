@@ -91,7 +91,7 @@ class AbstractObject(collections_abc.MutableMapping):
         new_object._set_data(data)
         return new_object
 
-    def get(self):
+    def api_get(self):
         """
         Returns the object data
         """
